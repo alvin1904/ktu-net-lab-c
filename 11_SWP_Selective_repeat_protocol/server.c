@@ -1,13 +1,13 @@
-#include<stdio.h>
-#include<sys/types.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
-#include<string.h>
-#include<time.h>
-#include<stdlib.h>
-#include<ctype.h>
-#include<arpa/inet.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
+#include <time.h>
+#include <ctype.h>
 
 #define W 5
 #define P1 50
@@ -18,54 +18,53 @@ char b[10];
 void alpha9(int);
 void alp(int);
 
-
 int main()
 {
-    struct sockaddr_in ser,cli;
-    int s,n,sock,i,j,c=1,f;
+    struct sockaddr_in ser, cli;
+    int s, n, sock, i, j, c = 1, f;
     unsigned int s1;
-    s=socket(AF_INET,SOCK_STREAM,0);
-    ser.sin_family=AF_INET;
-    ser.sin_port=6500;
-    ser.sin_addr.s_addr=inet_addr("127.0.0.1");
-    bind(s,(struct sockaddr *) &ser, sizeof(ser));
-    listen(s,1);
-    n=sizeof(cli);
-    sock=accept(s,(struct sockaddr *)&cli, &n);
+    s = socket(AF_INET, SOCK_STREAM, 0);
+    ser.sin_family = AF_INET;
+    ser.sin_port = 6500;
+    ser.sin_addr.s_addr = inet_addr("127.0.0.1");
+    bind(s, (struct sockaddr *)&ser, sizeof(ser));
+    listen(s, 1);
+    n = sizeof(cli);
+    sock = accept(s, (struct sockaddr *)&cli, &n);
     printf("\nTCP Connection Established.\nSelective Repeat\n");
-    s1=(unsigned int) time(NULL);
+    s1 = (unsigned int)time(NULL);
     srand(s1);
-    strcpy(b,"Time Out ");
-    recv(sock,a,sizeof(a),0);
-    f=atoi(a);
-    while(1)
+    strcpy(b, "Time Out ");
+    recv(sock, a, sizeof(a), 0);
+    f = atoi(a);
+    while (1)
     {
-        for(i=0;i<W;i++)
+        for (i = 0; i < W; i++)
         {
-            recv(sock,a,sizeof(a),0);
-            if(strcmp(a,b)==0)
+            recv(sock, a, sizeof(a), 0);
+            if (strcmp(a, b) == 0)
             {
                 break;
             }
         }
-        i=0;
-        while(i<W)
+        i = 0;
+        while (i < W)
         {
-            L:
-                j=rand()%P1;
-            if(j<P2)
+        L:
+            j = rand() % P1;
+            if (j < P2)
             {
                 alp(c);
-                send(sock,b,sizeof(b),0);
+                send(sock, b, sizeof(b), 0);
                 goto L;
             }
             else
             {
                 alpha9(c);
-                if(c<=f)
+                if (c <= f)
                 {
-                    printf("\nFrame %s Received ",a);
-                    send(sock,a,sizeof(a),0);
+                    printf("\nFrame %s Received ", a);
+                    send(sock, a, sizeof(a), 0);
                 }
                 else
                 {
@@ -73,7 +72,7 @@ int main()
                 }
                 c++;
             }
-            if(c>f)
+            if (c > f)
             {
                 break;
             }
@@ -85,50 +84,45 @@ int main()
     return 0;
 }
 
-
 void alpha9(int z)
 {
-    int k,i=0,j,g;
-    k=z;
-    while(k>0)
+    int k, i = 0, j, g;
+    k = z;
+    while (k > 0)
     {
         i++;
-        k=k/10;
+        k = k / 10;
     }
-    g=i;
+    g = i;
     i--;
-    while(z>0)
+    while (z > 0)
     {
-        k=z%10;
-        a[i]=k+48;
+        k = z % 10;
+        a[i] = k + 48;
         i--;
-        z=z/10;
+        z = z / 10;
     }
-    a[g]='\0';
+    a[g] = '\0';
 }
-
 
 void alp(int z)
 {
-    int k,i=1,j,g;
-    k=z;
-    b[0]='N';
-    while(k>0)
+    int k, i = 1, j, g;
+    k = z;
+    b[0] = 'N';
+    while (k > 0)
     {
         i++;
-        k=k/10;
+        k = k / 10;
     }
-    g=i;
+    g = i;
     i--;
-    while(z>0)
+    while (z > 0)
     {
-        k=z%10;
-        b[i]=k+48;
+        k = z % 10;
+        b[i] = k + 48;
         i--;
-        z=z/10;
+        z = z / 10;
     }
-    b[g]='\0';
+    b[g] = '\0';
 }
-
-
-

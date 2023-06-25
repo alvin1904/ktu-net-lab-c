@@ -1,1 +1,15 @@
+# Ignore .a.out files
+*.a.out
 
+# Ignore compiled client and server files
+client
+server
+
+# Ignore .a.out files
+**/*.a.out
+
+# Ignore compiled client and server files
+**/client
+**/server
+**/client
+**/server

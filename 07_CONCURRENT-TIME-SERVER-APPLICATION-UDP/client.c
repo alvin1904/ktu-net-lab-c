@@ -3,8 +3,8 @@
 // client. Client displays the result.*  Batch 1- 26-04-2023 AN, Submit before  8.00pm today.
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

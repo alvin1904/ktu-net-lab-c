@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #define SIZE 1024
 
 void send_file(FILE *fp, int sockfd)

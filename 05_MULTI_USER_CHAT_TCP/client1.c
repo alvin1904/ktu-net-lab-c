@@ -25,9 +25,9 @@ void send_recv(int i, int sockfd)
 			send(sockfd, send_buf, strlen(send_buf), 0);
 	}else {
 		nbyte_recvd = recv(sockfd, recv_buf, BUFSIZE, 0);
-		recv_buf[nbyte_recvd] = '\0';
-		printf("%s\n" , recv_buf);
-		fflush(stdout);
+		recv_buf[nbyte_recvd] = '\0'; // Add null-terminator
+		printf("%s\n" , recv_buf); 
+		fflush(stdout); // Flush stdout buffer
 	}
 }
 		
@@ -38,10 +38,10 @@ void connect_request(int *sockfd, struct sockaddr_in *server_addr)
 		perror("Socket");
 		exit(1);
 	}
-	server_addr->sin_family = AF_INET;
-	server_addr->sin_port = htons(4950);
-	server_addr->sin_addr.s_addr = inet_addr("127.0.0.1");
-	memset(server_addr->sin_zero, '\0', sizeof server_addr->sin_zero);
+	server_addr->sin_family = AF_INET; // host byte order
+	server_addr->sin_port = htons(4950); // htons: host to network short
+	server_addr->sin_addr.s_addr = inet_addr("127.0.0.1"); // Localhost
+	memset(server_addr->sin_zero, '\0', sizeof server_addr->sin_zero); // Zero the rest of the struct
 	
 	if(connect(*sockfd, (struct sockaddr *)server_addr, sizeof(struct sockaddr)) == -1) {
 		perror("connect");
@@ -53,26 +53,26 @@ int main()
 {
 	int sockfd, fdmax, i;
 	struct sockaddr_in server_addr;
-	fd_set master;
-	fd_set read_fds;
+	fd_set master; // master file descriptor list
+	fd_set read_fds; // temp file descriptor list for select()
 	
 	connect_request(&sockfd, &server_addr);
-	FD_ZERO(&master);
+	FD_ZERO(&master); // Clear master and temp sets
         FD_ZERO(&read_fds);
         FD_SET(0, &master);
         FD_SET(sockfd, &master);
-	fdmax = sockfd;
+	fdmax = sockfd; // Keep track of the biggest file descriptor
 	
 	while(1){
-		read_fds = master;
-		if(select(fdmax+1, &read_fds, NULL, NULL, NULL) == -1){
+		read_fds = master; // Copy it
+		if(select(fdmax+1, &read_fds, NULL, NULL, NULL) == -1){ // Select() blocks until an I/O event occurs
 			perror("select");
 			exit(4);
 		}
 		
-		for(i=0; i <= fdmax; i++ )
-			if(FD_ISSET(i, &read_fds))
-				send_recv(i, sockfd);
+		for(i=0; i <= fdmax; i++ ) // Run through the existing connections looking for data to read
+			if(FD_ISSET(i, &read_fds)) // Is it set in read_fds?
+				send_recv(i, sockfd); // Handle data from a client
 	}
 	printf("client-quited\n");
 	close(sockfd);

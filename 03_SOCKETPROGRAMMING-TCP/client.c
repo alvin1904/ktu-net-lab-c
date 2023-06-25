@@ -1,14 +1,15 @@
-#include <arpa/inet.h> // inet_addr()
 #include <stdio.h>
 #include <netdb.h>
 #include <stdlib.h>
 #include <string.h>
-#include <strings.h> // bzero()
 #include <sys/socket.h>
 #include <unistd.h> // read(), write(), close()
+#include <strings.h> // bzero()
+#include <arpa/inet.h> // inet_addr()
 #define MAX 80
 #define PORT 8080
 #define SA struct sockaddr
+// Function designed for chat between client and server.
 void func(int sockfd)
 {
     char buff[MAX];
@@ -18,11 +19,13 @@ void func(int sockfd)
         bzero(buff, sizeof(buff));
         printf("Enter the string : ");
         n = 0;
+        // copy server message in the buffer
         while ((buff[n++] = getchar()) != '\n')
             ;
-        write(sockfd, buff, sizeof(buff));
-        bzero(buff, sizeof(buff));
-        read(sockfd, buff, sizeof(buff));
+        // and send that buffer to client
+        write(sockfd, buff, sizeof(buff)); // write to socket
+        bzero(buff, sizeof(buff)); // clear buffer
+        read(sockfd, buff, sizeof(buff)); // read from socket
         printf("From Server : %s", buff);
         if ((strncmp(buff, "exit", 4)) == 0)
         {
@@ -34,8 +37,8 @@ void func(int sockfd)
 
 int main()
 {
-    int sockfd, connfd;
-    struct sockaddr_in servaddr, cli;
+    int sockfd, connfd; // socket file descriptor
+    struct sockaddr_in servaddr, cli; // server and client address
 
     // socket create and verification
     sockfd = socket(AF_INET, SOCK_STREAM, 0);

@@ -11,10 +11,10 @@ int main()
     struct sockaddr_in client, server;
     int s, n;
     char b1[100], b2[100];
-    s = socket(AF_INET, SOCK_DGRAM, 0);
+    s = socket(AF_INET, SOCK_DGRAM, 0); // SOCK_DGRAM for UDP
     server.sin_family = AF_INET;
     server.sin_port = 2000;
-    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server.sin_addr.s_addr = inet_addr("127.0.0.1"); // Localhost
     printf("\nClient ready....\n");
     n = sizeof(server);
 
