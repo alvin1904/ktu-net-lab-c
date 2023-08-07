@@ -10,30 +10,26 @@
 #define PORT 8080
 #define SA struct sockaddr
 // Function designed for chat between client and server.
-void func(int connfd)
-{
+void func(int connfd){
     char buff[MAX];
     int n;
-    for (;;)
-    {
+    for(;;){
         bzero(buff, MAX);
-        // read the message from client and copy it in buffer
-        read(connfd, buff, sizeof(buff));
-        // print buffer which contains the client contents
-        printf("From client: %s\t To client : ", buff);
-        bzero(buff, MAX);
-        n = 0;
-        // copy server message in the buffer
-        while ((buff[n++] = getchar()) != '\n')
-            ;
-
-        // and send that buffer to client
-        write(connfd, buff, sizeof(buff));
-
-        // if msg contains "Exit" then server exit and chat ended.
-        if (strncmp("exit", buff, 4) == 0)
+        ssize_t bytesRead = read(connfd, buff, sizeof(buff));
+        if (bytesRead <= 0) {
+            break;
+        }
+        printf("From client: %s\t To client: ", buff);
+        if (fgets(buff, sizeof(buff), stdin) == NULL) {
+            break;
+        }
+        ssize_t bytesWritten = write(connfd, buff, strlen(buff));
+        if (bytesWritten <= 0) {
+            break;
+        }
+        if ((strncmp(buff, "exit", 4)) == 0)
         {
-            printf("Server Exit...\n");
+            printf("Client Exit...\n");
             break;
         }
     }
