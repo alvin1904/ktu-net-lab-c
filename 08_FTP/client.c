@@ -5,56 +5,46 @@
 #include <unistd.h>
 #define SIZE 1024
 
-void send_file(FILE *fp, int sockfd)
-{
-    int n;
-    char data[SIZE] = {0};
+void send_file(FILE *fp, int sockfd) {
+    char data[SIZE];
+    size_t n;
 
-    while (fgets(data, SIZE, fp) != NULL)
-    {
-        if (send(sockfd, data, sizeof(data), 0) == -1)
-        {
+    while ((n = fread(data, 1, SIZE, fp)) > 0) {
+        if (send(sockfd, data, n, 0) == -1) {
             perror("[-]Error in sending file.");
             exit(1);
         }
-        bzero(data, SIZE);
     }
 }
 
-int main()
-{
-    char *ip = "127.0.0.1";
-    int port = 8080;
-    int e;
-
+int main() {
+    const char *ip = "127.0.0.1";
+    const int port = 8080;
+    
     int sockfd;
     struct sockaddr_in server_addr;
     FILE *fp;
-    char *filename = "hello.txt";
+    const char *filename = "hello.txt";
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0)
-    {
+    if (sockfd < 0) {
         perror("[-]Error in socket");
         exit(1);
     }
     printf("[+]Server socket created successfully.\n");
 
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = port;
+    server_addr.sin_port = htons(port);  // Use htons() to convert port to network byte order
     server_addr.sin_addr.s_addr = inet_addr(ip);
 
-    e = connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    if (e == -1)
-    {
+    if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
         perror("[-]Error in socket");
         exit(1);
     }
     printf("[+]Connected to Server.\n");
 
-    fp = fopen(filename, "r");
-    if (fp == NULL)
-    {
+    fp = fopen(filename, "rb");  // Open the file in binary mode for cross-platform compatibility
+    if (fp == NULL) {
         perror("[-]Error in reading file.");
         exit(1);
     }

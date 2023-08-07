@@ -2,35 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 #define SIZE 1024
 
-void write_file(int sockfd)
+void write_file(FILE *fp, int sockfd)
 {
     int n;
-    FILE *fp;
-    char *filename = "hello_received.txt";
     char buffer[SIZE];
 
-    fp = fopen(filename, "w");
-    while (1)
+    while ((n = recv(sockfd, buffer, SIZE, 0)) > 0)
     {
-        n = recv(sockfd, buffer, SIZE, 0);
-        if (n <= 0)
-        {
-            break;
-            return;
-        }
-        fprintf(fp, "%s", buffer);
-        bzero(buffer, SIZE);
+        fwrite(buffer, sizeof(char), n, fp);
+        memset(buffer, 0, SIZE);
     }
-    return;
 }
 
 int main()
 {
-    char *ip = "127.0.0.1";
-    int port = 8080;
-    int e;
+    const char *ip = "127.0.0.1";
+    const int port = 8080;
 
     int sockfd, new_sock;
     struct sockaddr_in server_addr, new_addr;
@@ -46,16 +36,15 @@ int main()
     printf("[+]Server socket created successfully.\n");
 
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = port;
+    server_addr.sin_port = htons(port);
     server_addr.sin_addr.s_addr = inet_addr(ip);
 
-    e = bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    if (e < 0)
+    if (bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
         perror("[-]Error in bind");
         exit(1);
     }
-    printf("[+]Binding successfull.\n");
+    printf("[+]Binding successful.\n");
 
     if (listen(sockfd, 10) == 0)
     {
@@ -69,8 +58,25 @@ int main()
 
     addr_size = sizeof(new_addr);
     new_sock = accept(sockfd, (struct sockaddr *)&new_addr, &addr_size);
-    write_file(new_sock);
-    printf("[+]Data written in the file successfully.\n");
+    if (new_sock < 0)
+    {
+        perror("[-]Error in accepting");
+        exit(1);
+    }
+
+    FILE *fp = fopen("hello_received.txt", "w");
+    if (fp == NULL)
+    {
+        perror("[-]Error opening file");
+        exit(1);
+    }
+
+    write_file(fp, new_sock);
+    printf("[+]Data written to the file successfully.\n");
+
+    fclose(fp);
+    close(new_sock);
+    close(sockfd);
 
     return 0;
 }
