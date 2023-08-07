@@ -1,6 +1,6 @@
 // Implement Concurrent Time Server application using UDP to execute the program at remote
 // server. Client sends a time request to the server, server sends its system time back to the
-// client. Client displays the result.*  Batch 1- 26-04-2023 AN, Submit before  8.00pm today.
+// client. Client displays the result.*
 
 #include <stdio.h>
 #include <string.h>

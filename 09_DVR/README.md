@@ -16,7 +16,7 @@ These are preprocessor directives that include the necessary header files for in
 struct node {
     unsigned dist[MAX_NODES];
     unsigned from[MAX_NODES];
-};
+}rt[10];
 ```
 Here, a structure named `node` is defined. It contains two arrays: `dist` and `from`, both with a maximum size of `MAX_NODES`. This structure seems to be used to store distance and routing information for nodes.
 
